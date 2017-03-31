@@ -1,5 +1,5 @@
-#ReactGoYo
+# ReactGoYo
 
-A yeoman generator for react go.
+A yeoman generator for reactGo.
 
 Under development.
