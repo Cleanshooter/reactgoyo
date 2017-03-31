@@ -1,0 +1,15 @@
+{
+  "name": "generator-reactgoyo",
+  "version": "0.0.0",
+  "description": "A Yeoman Generator for ReactGo",
+  "files": [
+    "app",
+    "dataset"
+  ],
+  "keywords": ["yeoman-generator"],
+  "dependencies": {
+    "yeoman-generator": "^1.0.0"
+  },
+  "author": "Joe Motacek",
+  "license": "GPL-2"
+}
