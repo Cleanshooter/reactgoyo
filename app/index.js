@@ -1,9 +1,14 @@
 var Generator = require('yeoman-generator');
 
+// Local Imports
+var updateModelIndex = require('./updaters/updateModelIndex');
+var updateControllerIndex = require('./updaters/updateControllerIndex');
+var updateServerRoutes = require('./updaters/updateServerRoutes');
+
 const modelFieldsArray = [];
 
 module.exports = Generator.extend({
-	// Prinvate recursive modole field generator
+	// Private recursive modole field generator
 	_modelField(resolve) {
     const prompts = [
 			{
@@ -30,7 +35,7 @@ module.exports = Generator.extend({
 
 	prompting: {
 		welcome() {
-			this.log('Welcome to the ReactGo dataset generator!')
+			this.log('Welcome to the ReactGo collection generator!')
 	  	this.log('To get an idea of all the things it does please check out my blog post.')
 	  	this.log('http://www.joemotacek.com/reactgo-steps-to-add-a-new-data-set-to-the-store/');
 		},
@@ -38,17 +43,19 @@ module.exports = Generator.extend({
 			const prompts = [
 				{
 		      type    : 'input',
-		      name    : 'dataset_name',
-		      message : 'What is your new dataset\'s name?'
+		      name    : 'collection_name',
+		      message : 'What is your new collection name?'
 		    }
 			];
 			return this.prompt(prompts).then((answers) => {
-	      this.log('dataset name', answers.dataset_name);
+				this.props = Object.assign({}, this.props, answers);
+	      // this.log('collection name', answers.collection_name);
 	    });
 		},
 		modelFields() {
 			return new Promise((resolve) => this._modelField(resolve)).then((answers) => {
-				this.log('model fields', answers);
+				this.props = Object.assign({}, this.props, {model_fields: answers});
+				// this.log('model fields', answers);
 			});
 		},
 		contolerOptions() {
@@ -68,7 +75,7 @@ module.exports = Generator.extend({
 					    checked: true
 					  }, {
 					    name: '(PUT) Update',
-					    value: 'udpate',
+					    value: 'update',
 					    checked: true
 					  },
 					  {
@@ -89,7 +96,7 @@ module.exports = Generator.extend({
 				},
 				{
 		      type: 'confirm',
-				  name: 'build_default_reducer',
+				  name: 'default_reducer',
 				  message: 'Generate a redux reducer for your selected controller methods?',
 				  default: true,
 				  when: function(answers){
@@ -98,7 +105,7 @@ module.exports = Generator.extend({
 		    },
 				{
 		      type: 'confirm',
-				  name: 'build_default_actions',
+				  name: 'default_actions',
 				  message: 'Generate actions?',
 				  default: true,
 				  when: function(answers){
@@ -107,16 +114,62 @@ module.exports = Generator.extend({
 		    }
 			];
 			return this.prompt(prompts).then((answers) => {
-	      this.log('controler methods', answers.controller_methods);
-	      this.log('data fetcher?', answers.data_fetcher);
-	      this.log('build reducer?', answers.build_default_reducer);
-	      this.log('build actions?', answers.build_default_actions);
+				this.props = Object.assign({}, this.props, answers);
+	      //this.log('Complete Props', JSON.stringify(this.props, '', 2));
 	    });
 		}
   },
 
-  configuring: () => {
-    console.log('Config: ', this.modelFieldsArray);
-  },
+  writing() {
+  	// Create the model
+  	this.fs.copyTpl(
+  		this.templatePath('model.js'),
+  		this.destinationPath(`server/db/mongo/models/${this.props.collection_name.toLowerCase()}.js`),
+      {
+      	name: this.props.collection_name,
+      	fields: this.props.model_fields
+			}
+  	);
+  	updateModelIndex(this);
 
+  	// Create the controller
+  	if(this.props.controller_methods.length > 0){
+  		this.fs.copyTpl(
+	  		this.templatePath('controller.js'),
+	  		this.destinationPath(`server/db/mongo/controllers/${this.props.collection_name.toLowerCase()}.js`),
+	      {
+	      	name: this.props.collection_name,
+	      	methods: this.props.controller_methods
+				}
+	  	);
+	  	// Update teh Controller Index
+	  	updateControllerIndex(this);
+	  	//Create the routes
+	  	updateServerRoutes(this);
+
+	  	//Conditionally create data fetcher
+			if(this.props.data_fetcher){
+				this.fs.copyTpl(
+					this.templatePath('fetchData.js'),
+					this.destinationPath(`app/fetch-data/fetch${this.props.collection_name}Data.js`),
+					{
+						name: this.props.collection_name
+					}
+				);
+	  	}
+
+	  	//Conditionally create default reducer
+			if(this.props.default_reducer){
+				this.fs.copyTpl(
+					this.templatePath('reducer.js'),
+					this.destinationPath(`app/reducers/${this.props.collection_name.toLowerCase()}.js`),
+					{
+						name: this.props.collection_name,
+						methods: this.props.controller_methods,
+						fields: this.props.model_fields
+					}
+				);
+	  	}
+  	}
+  }
 });
