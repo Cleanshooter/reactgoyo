@@ -10,7 +10,7 @@ const updateServerRoutes = (yeomanContext) => {
 
 	yeomanContext.fs.copy(file, file, {
 		process: function(content) {
-			const sourceTree = esprima.parse(content.toString(), { sourceType: 'module' });
+			const sourceTree = esprima.parse(content.toString(), { sourceType: 'module', comment: true });
 			// const exportedModule = sourceTree.body[_.findIndex(sourceTree.body, {type: 'ExportDefaultDeclaration'})].declaration.body.body;
 			// console.log(exportedModule[exportedModule.length-1].consequent.body[1].expression.arguments[1]);
 			// Find the last const declaration and add a new one.
@@ -43,7 +43,7 @@ const updateServerRoutes = (yeomanContext) => {
 				routes += `} else {
 					console.warn(unsupportedMessage('${yeomanContext.props.collection_name} routes not available'));
 				}`;
-				console.log(esprima.parse(routes).body[0]);
+				// console.log(esprima.parse(routes).body[0]);
 				return esprima.parse(routes).body[0];
 			})());
 

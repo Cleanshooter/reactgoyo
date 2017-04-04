@@ -1,10 +1,9 @@
 {
   "name": "generator-reactgoyo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Yeoman Generator for ReactGo",
   "files": [
-    "app",
-    "dataset"
+    "app"
   ],
   "keywords": [
     "yeoman-generator"

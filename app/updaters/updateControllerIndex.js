@@ -7,7 +7,7 @@ const updateControllerIndex = (yeomanContext) => {
 	const currentControllerIndex = yeomanContext.destinationPath('server/db/mongo/controllers/index.js');
 	yeomanContext.fs.copy(currentControllerIndex, currentControllerIndex, {
 		process: function(content) {
-			const sourceTree = esprima.parse(content.toString(), { sourceType: 'module' });
+			const sourceTree = esprima.parse(content.toString(), { sourceType: 'module', comment: true });
 			// console.log(sourceTree.body[_.findIndex(sourceTree.body, {type: 'ImportDeclaration'})]);
 			// Find the last import and add a new one.
 			sourceTree.body.splice(

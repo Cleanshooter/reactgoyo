@@ -6,7 +6,7 @@ const updateModelIndex = (yeomanContext) => {
 	const currentModelIndex = yeomanContext.destinationPath('server/db/mongo/models/index.js');
 	yeomanContext.fs.copy(currentModelIndex, currentModelIndex, {
 		process: function(content) {
-			const sourceTree = esprima.parse(content.toString(), { sourceType: 'module' });
+			const sourceTree = esprima.parse(content.toString(), { sourceType: 'module', comment: true });
 			// console.log(sourceTree.body[0].declaration.body.body);
 			sourceTree.body[0].declaration.body.body.push({
 				type: "ExpressionStatement",

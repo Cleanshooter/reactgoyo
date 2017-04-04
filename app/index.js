@@ -1,9 +1,12 @@
 var Generator = require('yeoman-generator');
 
-// Local Imports
+// File Updaters
 var updateModelIndex = require('./updaters/updateModelIndex');
 var updateControllerIndex = require('./updaters/updateControllerIndex');
 var updateServerRoutes = require('./updaters/updateServerRoutes');
+var updateFetchDataIndex = require('./updaters/updateFetchDataIndex');
+var updateReducerIndex = require('./updaters/updateReducerIndex');
+var updateTypesIndex = require('./updaters/updateTypesIndex');
 
 const modelFieldsArray = [];
 
@@ -106,10 +109,10 @@ module.exports = Generator.extend({
 				{
 		      type: 'confirm',
 				  name: 'default_actions',
-				  message: 'Generate actions?',
+				  message: 'Generate default actions?',
 				  default: true,
 				  when: function(answers){
-				  	return answers.controller_methods.length > 0;
+				  	return answers.controller_methods.length > 0 && answers.default_reducer;
 				  }
 		    }
 			];
@@ -142,7 +145,7 @@ module.exports = Generator.extend({
 	      	methods: this.props.controller_methods
 				}
 	  	);
-	  	// Update teh Controller Index
+	  	// Update the Controller Index
 	  	updateControllerIndex(this);
 	  	//Create the routes
 	  	updateServerRoutes(this);
@@ -156,6 +159,7 @@ module.exports = Generator.extend({
 						name: this.props.collection_name
 					}
 				);
+				updateFetchDataIndex(this);
 	  	}
 
 	  	//Conditionally create default reducer
@@ -163,6 +167,25 @@ module.exports = Generator.extend({
 				this.fs.copyTpl(
 					this.templatePath('reducer.js'),
 					this.destinationPath(`app/reducers/${this.props.collection_name.toLowerCase()}.js`),
+					{
+						name: this.props.collection_name,
+						methods: this.props.controller_methods,
+						fields: this.props.model_fields
+					}
+				);
+				updateReducerIndex(this);
+	  	}
+
+	  	//Update the types index
+	  	if(this.props.data_fetcher || this.props.default_reducer){
+	  		updateTypesIndex(this);
+	  	}
+
+	  	//Generate the adefault actions
+	  	if(this.props.default_actions){
+	  		this.fs.copyTpl(
+					this.templatePath('actions.js'),
+					this.destinationPath(`app/actions/${this.props.collection_name.toLowerCase()}.js`),
 					{
 						name: this.props.collection_name,
 						methods: this.props.controller_methods,
