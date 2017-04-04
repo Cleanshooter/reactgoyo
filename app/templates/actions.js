@@ -34,7 +34,7 @@ export function create<%= name %>(data) {
 				if (res.status === 200) {
 					return dispatch({
 						type: types.CREATE_<%= name.toUpperCase() %>_SUCCESS,
-						_id: res.data._id
+						_id: res.data._id,
 						<%_ fields.forEach( (field) => { -%>
 							<%_ if (field.fieldName && field.fieldName.trim() !== '') { -%>
 						<%= field.fieldName %>: res.data.<%= field.fieldName %>,
@@ -71,7 +71,7 @@ export function delete<%= name %>(data) {
 	return dispatch => {
 		return make<%= name %>Request('delete', data._id)
 			.then(() => dispatch({type: types.DELETE_<%= name.toUpperCase() %>, id: data._id}))
-			.catch(() => dispatch(c<%= name.toLowerCase() %>Failure({ error: 'Could not delete <%= name.toLowerCase() %>. (Resource unavailable)'})));
+			.catch(() => dispatch(<%= name.toLowerCase() %>Failure({ error: 'Could not delete <%= name.toLowerCase() %>. (Resource unavailable)'})));
 	};
 }
 <% } %>

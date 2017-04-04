@@ -18,12 +18,12 @@ const <%= name.toLowerCase() %> = (
 			};
 		<%_ } if (methods.indexOf('update') >= 0) { -%>
 		case types.UPDATE_<%= name.toUpperCase() %>:
-			if (state._id === action._id) {
+			if (state._id === action.data._id) {
 				return {
 					...state,
 					<%_ fields.forEach( (field) => { -%>
 				  	<%_ if (field.fieldName && field.fieldName.trim() !== '') { -%>
-					<%= field.fieldName %>: action.<%= field.fieldName %>,
+					<%= field.fieldName %>: action.data.<%= field.fieldName %>,
 						<%_ }
 					}); -%>
 				};

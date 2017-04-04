@@ -1,7 +1,7 @@
 <% if (methods.indexOf('update') >= 0) { -%>
 import _ from 'lodash';
 <% } -%>
-import <%= name %> from '../models/<%= name %>';
+import <%= name %> from '../models/<%= name.toLowerCase() %>';
 <% if (methods.indexOf('all') >= 0) { %>
 /**
  * List
@@ -45,7 +45,7 @@ export function update(req, res) {
 			return res.status(500).send('We failed to save the <%= name.toLowerCase() %> update for some reason');
 		}
 
-		return res.status(200).send('Updated the <%= name.toLowerCase() %> uccessfully');
+		return res.status(200).send('Updated the <%= name.toLowerCase() %> successfully');
 	});
 }
 <% } if (methods.indexOf('remove') >= 0) { %>
